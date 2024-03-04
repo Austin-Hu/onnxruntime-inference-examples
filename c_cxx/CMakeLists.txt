@@ -35,9 +35,11 @@ endif()
 # directories under /include/onnxruntime/core/providers
 include_directories("${ONNXRUNTIME_ROOTDIR}/include"                           # Pre-built package
                     "${ONNXRUNTIME_ROOTDIR}/include/onnxruntime"               # Linux local install to /usr/local
+		    "${ONNXRUNTIME_ROOTDIR}/build/native/include"               # Windows NuGet local installed package
                     "${ONNXRUNTIME_ROOTDIR}/include/onnxruntime/core/session") # Windows local install
 
-link_directories("${ONNXRUNTIME_ROOTDIR}/lib")
+link_directories("${ONNXRUNTIME_ROOTDIR}/lib"
+	"${ONNXRUNTIME_ROOTDIR}/runtimes/win-x64/native")
 
 if(WIN32)
   add_library(wil INTERFACE)
@@ -80,7 +82,7 @@ endif()
 # the output dir. Define a function to do so. This is called from the cmake file in the subdirectories.
 function(copy_ort_dlls target_name)
   if (MSVC)
-      file(GLOB ORT_DLLS ${ONNXRUNTIME_ROOTDIR}/bin/*.dll)
+      file(GLOB ORT_DLLS ${ONNXRUNTIME_ROOTDIR}/runtimes/win-x64/native/*.dll)
       foreach(ORT_DLL ${ORT_DLLS})
           add_custom_command(TARGET ${target_name} POST_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy ${ORT_DLL}  $<TARGET_FILE_DIR:${target_name}>)
